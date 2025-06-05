@@ -1,0 +1,14 @@
+{{ notification.title }}
+
+Hello {{ user.username }},
+
+{{ notification.message }}
+
+{% if notification.related_trip %}
+Trip details:
+- From: {{ notification.related_trip.start_location }}
+- To: {{ notification.related_trip.end_location }}
+- Date: {{ notification.related_trip.departure_time|date:"F j, Y, g:i a" }}
+{% endif %}
+
+This is an automated message from RideShare. Please do not reply to this email. 
