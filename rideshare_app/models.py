@@ -398,11 +398,74 @@ class ChatMessage(models.Model):
     def __str__(self):
         return f"Сообщение от {self.sender.username} в чате {self.chat.id}"
 class Package(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_packages")
-    recipient_name = models.CharField(max_length=100)
-    origin = models.CharField(max_length=100)
-    destination = models.CharField(max_length=100)
-    weight_kg = models.DecimalField(max_digits=5, decimal_places=2)
-    description = models.TextField(blank=True)
-    date = models.DateField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    """Посылка, передаваемая между пользователями."""
+
+    PENDING = "pending"
+    ASSIGNED = "assigned"
+    DELIVERED = "delivered"
+    CANCELLED = "cancelled"
+
+    STATUS_CHOICES = [
+        (PENDING, "В поиске водителя"),
+        (ASSIGNED, "В пути"),
+        (DELIVERED, "Доставлено"),
+        (CANCELLED, "Отменено"),
+    ]
+
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_packages",
+        verbose_name="Отправитель",
+    )
+    trip = models.ForeignKey(
+        "Trip",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="packages",
+        verbose_name="Поездка",
+    )
+    recipient_name = models.CharField(max_length=100, verbose_name="Получатель")
+    origin = models.CharField(max_length=100, verbose_name="Откуда")
+    destination = models.CharField(max_length=100, verbose_name="Куда")
+    weight_kg = models.DecimalField(
+        max_digits=5, decimal_places=2, verbose_name="Вес (кг)"
+    )
+    description = models.TextField(blank=True, verbose_name="Описание")
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Цена",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=PENDING,
+        verbose_name="Статус",
+    )
+    date = models.DateField(verbose_name="Дата отправки")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Обновлено")
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Посылка"
+        verbose_name_plural = "Посылки"
+
+    def __str__(self):
+        return f"Посылка от {self.sender} для {self.recipient_name}" \
+            f" ({self.get_status_display()})"
+
+    def assign_to_trip(self, trip: "Trip") -> None:
+        """Связывает посылку с поездкой и переводит ее в статус 'в пути'."""
+        self.trip = trip
+        self.status = self.ASSIGNED
+        self.save()
+
+    def mark_delivered(self) -> None:
+        """Помечает посылку доставленной."""
+        self.status = self.DELIVERED
+        self.save()

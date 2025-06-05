@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Trip, Booking, Review, Notification, ChatMessage, Complaint, TripReport, Chat
+from .models import User, Trip, Booking, Review, Notification, ChatMessage, Complaint, TripReport, Chat, Package
 from django.utils import timezone
 
 @admin.register(User)
@@ -71,6 +71,26 @@ class ChatMessageAdmin(admin.ModelAdmin):
     search_fields = ('sender__username', 'content')
     date_hierarchy = 'created_at'
     raw_id_fields = ('sender', 'chat')
+
+
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):
+    list_display = (
+        'sender',
+        'recipient_name',
+        'origin',
+        'destination',
+        'status',
+        'created_at',
+    )
+    list_filter = ('status', 'created_at')
+    search_fields = (
+        'sender__username',
+        'recipient_name',
+        'origin',
+        'destination',
+    )
+    date_hierarchy = 'created_at'
 
 
 admin.site.site_header = 'Администрирование RideShare'
