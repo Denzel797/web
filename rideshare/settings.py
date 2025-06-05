@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+
+# Load environment variables, if any.  This does not require python-dotenv and
+# simply relies on the current process environment.
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ik^q+eytfrjt+&asvxci&y&h=l0b^!-8=f(y(j0b3m(_@o!!)l'
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    'django-insecure-ik^q+eytfrjt+&asvxci&y&h=l0b^!-8=f(y(j0b3m(_@o!!)l'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -100,11 +106,11 @@ WSGI_APPLICATION = 'rideshare.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db_diplom',
-        'USER': 'postgres',
-        'PASSWORD': '1',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'db_diplom'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', '1'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -193,7 +199,7 @@ SIMPLE_JWT = {
 }
 
 # Yandex Maps API settings
-YANDEX_MAPS_API_KEY = 'e1b6249f-5f67-45f5-9fe5-0f12e1f02161'  # Replace with your actual API key
+YANDEX_MAPS_API_KEY = os.environ.get('YANDEX_MAPS_API_KEY', '')
 
 # Logging configuration
 LOGGING = {
