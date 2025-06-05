@@ -5,11 +5,15 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import User, Trip, Booking, Review, Notification, Message, Complaint, TripReport, Chat, ChatMessage
+from .models import (
+    User, Trip, Booking, Review, Notification, Message, Complaint,
+    TripReport, Chat, ChatMessage, Package
+)
 from .serializers import (
     UserSerializer, TripSerializer,
     BookingSerializer, ReviewSerializer,
-    NotificationSerializer, MessageSerializer, ComplaintSerializer, TripReportSerializer,
+    NotificationSerializer, MessageSerializer, ComplaintSerializer,
+    PackageSerializer, TripReportSerializer,
     ChatSerializer, ChatMessageSerializer
 )
 from .filters import TripFilter, BookingFilter, ReviewFilter
@@ -618,6 +622,38 @@ class ComplaintViewSet(viewsets.ModelViewSet):
             self.get_serializer(complaint).data,
             status=status.HTTP_201_CREATED
         )
+
+class PackageViewSet(viewsets.ModelViewSet):
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Package.objects.filter(sender=user)
+
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def assign(self, request, pk=None):
+        package = self.get_object()
+        trip_id = request.data.get('trip_id')
+        if not trip_id:
+            return Response({'error': 'trip_id required'}, status=400)
+        try:
+            trip = Trip.objects.get(id=trip_id)
+        except Trip.DoesNotExist:
+            return Response({'error': 'Trip not found'}, status=404)
+
+        package.assign_to_trip(trip)
+        return Response(self.get_serializer(package).data)
+
+    @action(detail=True, methods=['post'])
+    def mark_delivered(self, request, pk=None):
+        package = self.get_object()
+        package.mark_delivered()
+        return Response(self.get_serializer(package).data)
 
 class TripReportViewSet(viewsets.ModelViewSet):
     queryset = TripReport.objects.all()

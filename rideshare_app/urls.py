@@ -8,6 +8,7 @@ router.register(r'trips', views.TripViewSet)
 router.register(r'bookings', views.BookingViewSet)
 router.register(r'reviews', views.ReviewViewSet)
 router.register(r'complaints', views.ComplaintViewSet)
+router.register(r'packages', views.PackageViewSet)
 router.register(r'chats', views.ChatViewSet)
 router.register(r'reports', views.TripReportViewSet)
 

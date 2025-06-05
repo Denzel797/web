@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import User, Trip, Booking, Review, Notification, Message, Complaint, TripReport, Chat, ChatMessage
+from .models import (
+    User, Trip, Booking, Review, Notification, Message, Complaint,
+    TripReport, Chat, ChatMessage, Package
+)
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -206,6 +209,19 @@ class ComplaintSerializer(serializers.ModelSerializer):
         validated_data['reported_user'] = reported_user
         validated_data['complainant'] = self.context['request'].user
         return super().create(validated_data)
+
+class PackageSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    trip = TripSerializer(read_only=True)
+
+    class Meta:
+        model = Package
+        fields = [
+            'id', 'sender', 'trip', 'recipient_name', 'origin', 'destination',
+            'weight_kg', 'description', 'price', 'status', 'date',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['status', 'created_at', 'updated_at', 'trip']
 
 class TripReportSerializer(serializers.ModelSerializer):
     class Meta:
