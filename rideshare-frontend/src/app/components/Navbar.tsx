@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Navigation from '@/components/Navigation';
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -92,21 +93,16 @@ export default function Navbar() {
                 RideShare
               </Link>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link href="/trips" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500">
-                Поездки
-              </Link>
+            <div className="hidden sm:ml-6 sm:flex sm:items-center">
+              <Navigation />
               {isLoggedIn && !isLoading && (
                 <>
                   <Link href="/profile" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500">
                     {username || 'Профиль'}
                   </Link>
-                  <Link href="/bookings" className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500">
-                    Бронирования
-                  </Link>
                   {isAdmin && (
-                    <Link 
-                      href="/admin" 
+                    <Link
+                      href="/admin"
                       className="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-blue-500"
                       onClick={() => {
                         console.warn('🔐 [Navbar] Admin link clicked');

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Navigation from './Navigation';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -65,37 +66,8 @@ export default function Navbar() {
               </Link>
             </div>
             {user && (
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link
-                  href="/trips/all"
-                  className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-                >
-                  Все поездки
-                </Link>
-                <Link
-                  href="/trips"
-                  className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-                >
-                  Мои поездки
-                </Link>
-                <Link
-                  href="/trips/create"
-                  className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-                >
-                  Создать поездку
-                </Link>
-                <Link
-                  href="/bookings"
-                  className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-                >
-                  Мои бронирования
-                </Link>
-                <Link
-                  href="/send-packages"
-                  className="text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-                >
-                  Посылки
-                </Link>
+              <div className="hidden sm:ml-6 sm:flex sm:items-center">
+                <Navigation />
               </div>
             )}
           </div>
