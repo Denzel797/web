@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
+    {"offset": {"line": 60, "column": 0}, "map": {"version":3,"sources":["file://C%3A/Users/Admin/Desktop/sty/diplom3/rideshare-frontend/src/app/api/trips/route.ts"],"sourcesContent":["import { NextResponse } from 'next/server';\r\n\r\nexport async function GET(request: Request) {\r\n  const { searchParams } = new URL(request.url);\r\n  const ordering = searchParams.get('ordering');\r\n  \r\n  try {\r\n    const response = await fetch(`http://localhost:8000/api/trips/${ordering ? `?ordering=${ordering}` : ''}`, {\r\n      headers: {\r\n        'Authorization': request.headers.get('Authorization') || '',\r\n        'Content-Type': 'application/json',\r\n      },\r\n    });\r\n\r\n    const data = await response.json();\r\n    return NextResponse.json(data);\r\n  } catch (error) {\r\n    return NextResponse.json({ error: 'Failed to fetch trips' }, { status: 500 });\r\n  }\r\n} "],"names":[],"mappings":";;;AAAA;;AAEO,eAAe,IAAI,OAAgB;IACxC,MAAM,EAAE,YAAY,EAAE,GAAG,IAAI,IAAI,QAAQ,GAAG;IAC5C,MAAM,WAAW,aAAa,GAAG,CAAC;IAElC,IAAI;QACF,MAAM,WAAW,MAAM,MAAM,CAAC,gCAAgC,EAAE,WAAW,CAAC,UAAU,EAAE,UAAU,GAAG,IAAI,EAAE;YACzG,SAAS;gBACP,iBAAiB,QAAQ,OAAO,CAAC,GAAG,CAAC,oBAAoB;gBACzD,gBAAgB;YAClB;QACF;QAEA,MAAM,OAAO,MAAM,SAAS,IAAI;QAChC,OAAO,gIAAA,CAAA,eAAY,CAAC,IAAI,CAAC;IAC3B,EAAE,OAAO,OAAO;QACd,OAAO,gIAAA,CAAA,eAAY,CAAC,IAAI,CAAC;YAAE,OAAO;QAAwB,GAAG;YAAE,QAAQ;QAAI;IAC7E;AACF","debugId":null}}]
+}
