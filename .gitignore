@@ -4,3 +4,5 @@ __pycache__/
 *.log
 .env
 .DS_Store
+rideshare-frontend/node_modules/
+rideshare-frontend/.next/

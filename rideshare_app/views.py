@@ -5,12 +5,12 @@ from rest_framework.response import Response
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import User, Trip, Booking, Review, Notification, Message, Complaint, TripReport, Chat, ChatMessage
+from .models import User, Trip, Booking, Review, Notification, Message, Complaint, TripReport, Chat, ChatMessage, Package
 from .serializers import (
     UserSerializer, TripSerializer,
     BookingSerializer, ReviewSerializer,
     NotificationSerializer, MessageSerializer, ComplaintSerializer, TripReportSerializer,
-    ChatSerializer, ChatMessageSerializer
+    ChatSerializer, ChatMessageSerializer, PackageSerializer
 )
 from .filters import TripFilter, BookingFilter, ReviewFilter
 from .authentication import get_tokens_for_user
@@ -838,3 +838,47 @@ class ChatViewSet(viewsets.ModelViewSet):
 
         except Trip.DoesNotExist:
             return Response({'error': 'Поездка не найдена'}, status=404)
+
+
+class PackageViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing packages."""
+
+    queryset = Package.objects.all()
+    serializer_class = PackageSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['status']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        queryset = Package.objects.all()
+        if self.request.user.is_authenticated:
+            queryset = queryset.filter(sender=self.request.user)
+        return queryset
+
+    def perform_create(self, serializer):
+        trip_id = self.request.data.get('trip')
+        trip = None
+        if trip_id:
+            trip = get_object_or_404(Trip, id=trip_id)
+        serializer.save(sender=self.request.user, trip=trip)
+
+    @action(detail=True, methods=['post'])
+    def assign(self, request, pk=None):
+        package = self.get_object()
+        trip_id = request.data.get('trip_id')
+        if not trip_id:
+            return Response({'error': 'trip_id is required'}, status=400)
+        trip = get_object_or_404(Trip, id=trip_id)
+        if trip.driver != request.user:
+            return Response({'error': 'Только водитель может принять посылку'}, status=403)
+        package.assign_to_trip(trip)
+        return Response(self.get_serializer(package).data)
+
+    @action(detail=True, methods=['post'])
+    def deliver(self, request, pk=None):
+        package = self.get_object()
+        if not package.trip or package.trip.driver != request.user:
+            return Response({'error': 'Только водитель может завершить доставку'}, status=403)
+        package.mark_delivered()
+        return Response(self.get_serializer(package).data)

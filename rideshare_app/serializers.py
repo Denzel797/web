@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Trip, Booking, Review, Notification, Message, Complaint, TripReport, Chat, ChatMessage
+from .models import User, Trip, Booking, Review, Notification, Message, Complaint, TripReport, Chat, ChatMessage, Package
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -308,3 +308,20 @@ class ChatSerializer(serializers.ModelSerializer):
                 }
             }
         return None
+
+
+class PackageSerializer(serializers.ModelSerializer):
+    """Serializer for the Package model."""
+
+    sender = UserSerializer(read_only=True)
+    trip = TripSerializer(read_only=True)
+
+    class Meta:
+        model = Package
+        fields = '__all__'
+        read_only_fields = (
+            'created_at',
+            'updated_at',
+            'status',
+            'sender',
+        )
